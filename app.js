@@ -1,16 +1,7 @@
 
 var vm = document.querySelector(".vm")
-var vm1 = document.querySelector(".vm1")
-var vm2 = document.querySelector(".vm2")
-
-
-
-// window.addEventListener('devicemotion', function (event) {
-//     vm.textContent = event.acceleration.x;
-//     vm1.textContent = event.acceleration.y;
-//     vm2.textContent = event.acceleration.z;
-//     console.log(`${event.acceleration.x} m/s2`);
-// });
+var thresholdAcceleration = 1;
+// var
 
 function debounce(func, wait, immediate) {
     var timeout;
@@ -35,9 +26,68 @@ function debounce(func, wait, immediate) {
 };
 
 var returnedFunction = debounce(function (event) {
+    // Linear Accelaration on the x axis
+    if (event.acceleration.x < thresholdAcceleration) {
+        return
+    }
     vm.textContent = event.acceleration.x;
-    vm1.textContent = event.acceleration.y;
-    vm2.textContent = event.acceleration.z;
 }, 750);
 
 window.addEventListener('devicemotion', returnedFunction);
+
+var x = document.getElementById("demo");
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+
+// Previous Cordinates of the last taken picture
+var lat1 = 59.3293371;
+var lon1 = 13.4877472;
+
+function showPosition(position) {
+    // Current Position Cordinates 
+    var lat2 = position.coords.latitude;
+    var lon2 = position.coords.longitude;
+
+    x.innerHTML = "Distance in Meters: " + getDistanceFromLatLon(lat1, lon1, lat2, lon2).toFixed(1).toString();
+}
+
+// Error function callback that shows if there is an error on getting current position
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied the request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information is unavailable."
+            break;
+        case error.TIMEOUT:
+            x.innerHTML = "The request to get user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            x.innerHTML = "An unknown error occurred."
+            break;
+    }
+}
+// alert(getDistanceFromLatLon(59.3293371, 13.4877472, 59.3225525, 13.4619422).toFixed(1));
+function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c; // Distance in km
+    return d * 1000;//Distance in M
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180)
+}
