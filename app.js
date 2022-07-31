@@ -38,6 +38,6 @@ var returnedFunction = debounce(function (event) {
     vm.textContent = event.acceleration.x;
     vm1.textContent = event.acceleration.y;
     vm2.textContent = event.acceleration.z;
-}, 350);
+}, 750);
 
 window.addEventListener('devicemotion', returnedFunction);
