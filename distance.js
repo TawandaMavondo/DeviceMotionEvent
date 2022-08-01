@@ -61,6 +61,7 @@ function showPosition(position) {
     console.log("Accuracy: " + Number(position.coords.accuracy).toFixed(2).toString() + " m");
 }
 
+// Getter method to return the distance moved
 function getDistance() { return distance; }
 
 
