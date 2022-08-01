@@ -1,7 +1,6 @@
 
 var vm = document.querySelector(".vm")
 var thresholdAcceleration = 1;
-// var
 
 function debounce(func, wait, immediate) {
     var timeout;
@@ -27,33 +26,37 @@ function debounce(func, wait, immediate) {
 
 var returnedFunction = debounce(function (event) {
     // Linear Accelaration on the x axis
-    if (event.acceleration.x < thresholdAcceleration) {
-        return
-    }
-    vm.textContent = event.acceleration.x;
+    // if (event.acceleration.x < thresholdAcceleration) {
+    //     return
+    // }
+    // vm.textContent = event.acceleration.x;
+    getLocation();
 }, 750);
 
-window.addEventListener('devicemotion', returnedFunction);
 
 var x = document.getElementById("demo");
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.watchPosition(showPosition, showError, { enableHighAccuracy: true, timeout: 1500 });
     } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
 }
 
 // Previous Cordinates of the last taken picture
-var lat1 = 59.3293371;
-var lon1 = 13.4877472;
-
+var lat1 = 31.520007;
+var lon1 = -17.404954;
+var accuracy = document.querySelector(".accuracy");
 function showPosition(position) {
     // Current Position Cordinates 
     var lat2 = position.coords.latitude;
     var lon2 = position.coords.longitude;
 
-    x.innerHTML = "Distance in Meters: " + getDistanceFromLatLon(lat1, lon1, lat2, lon2).toFixed(1).toString();
+    console.log(lon2, lat2);
+    x.innerHTML = "Distance in Meters: " + getDistanceFromLatLon(lat2, lon2, lat1, lon1).toFixed(1).toString() + " m";
+    vm.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
+    accuracy.textContent = "Accuracy: " + Number(position.coords.accuracy).toFixed(2).toString() + " m";
 }
 
 // Error function callback that shows if there is an error on getting current position
@@ -73,7 +76,9 @@ function showError(error) {
             break;
     }
 }
-// alert(getDistanceFromLatLon(59.3293371, 13.4877472, 59.3225525, 13.4619422).toFixed(1));
+// Calculate distance from prev gps location and to the current gps location
+// distance in meters
+
 function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -85,9 +90,14 @@ function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
         ;
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c; // Distance in km
-    return d * 1000;//Distance in M
+    return d;//Distance in M
 }
 
 function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
+
+getLocation();
+
+
+
